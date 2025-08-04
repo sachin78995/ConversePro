@@ -7,23 +7,23 @@ import userRouter from "./routes/userRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
 import { Server } from "socket.io";
 
-//Create Express app and HTTP server
+// Create Express app and HTTP server
 const app = express();
 const server = http.createServer(app);
 
-//Socket.io setup
+// Socket.io setup
 export const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-//Store online users
+// Store online users
 export const userSocketMap = {};
 
-//Middleware setup
+// Middleware setup
 app.use(express.json({ limit: "4mb" }));
 app.use(cors());
 
-//Socket.io connection
+// Socket.io connection
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
   console.log("User Connected", userId);
@@ -44,24 +44,21 @@ io.on("connection", (socket) => {
   });
 });
 
-//Routes setup
+// Routes setup
 app.use("/api/status", (req, res) => {
   res.send("Server is live");
 });
 app.use("/api/auth", userRouter);
 app.use("/api/messages", messageRouter);
 
+// Connect to DB
 await connectDB();
 
+// Port setup
 const PORT = process.env.PORT || 5000;
 
-// If Railway or local environment, start listening
-if (
-  process.env.DEPLOYMENT_PLATFORM === "railway" ||
-  process.env.NODE_ENV !== "production"
-) {
-  server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
-}
+// ✅ Always listen on the port — required for Render
+server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 
-//Export server for vercel
+// Export for Vercel, etc.
 export default server;
