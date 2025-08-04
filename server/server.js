@@ -51,6 +51,11 @@ app.use("/api/status", (req, res) => {
 app.use("/api/auth", userRouter);
 app.use("/api/messages", messageRouter);
 
+// ✅ Root route to fix "Cannot GET /"
+app.get("/", (req, res) => {
+  res.send("Welcome to ConversePro Backend!");
+});
+
 // Connect to DB
 await connectDB();
 
